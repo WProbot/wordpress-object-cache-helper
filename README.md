@@ -73,29 +73,6 @@ $ip_address = $cache->get_object( 'my_server_public_ip_address', function() {
 echo 'Public IP Address: ' . $ip_address;
 ```
 
-#### Setting/Overriding Default Arguments
-
-When you create a `new WP_Cache_Object()`, you can specify (or use default) [arguments](#arguments) for the class. Optionally, you can override them per cached object/key:
-
-```php
-function get_the_time() {
-	return time();
-}
-
-$cache = new \MU_Plugins\WP_Cache_Object( [ 'expire' => WEEK_IN_SECONDS ] ); // Set the expire default to 1 week
-
-$the_time = $cache->get_object( 'current_time_cached_key_name', 'get_the_time', [
-	'expire' => DAY_IN_SECONDS, // Override default expire time to 1 day
-    'group' => 'date_time_cache_group' // Override default cache group
-]);
-
-echo 'Timestamp (cached): ' . $the_time;
-```
-
-Notice the third argument array for `get_object()` overrides those of the main object class instance. In this example, the expiration time is set to one day (rather than one week) and the cache group is set to "date_time_cache_group".
-
-In this way, you can create a single instance of `WP_Cache_Object()` and set the behavior per cached object/key.
-
 #### Passing Variables to Callback Function
 
 This example shows how to pass variables to an anonymous callback. You would not cache this in practice and purely serves as an example for passing variables. In this example, we pass `$name` and `$age` to the callback.
@@ -119,6 +96,14 @@ You can flush the entire cache using [`wp_cache_flush()`](https://developer.word
 
 ```php
 $cache->flush_group( 'my_cache_group' );
+```
+
+#### Deleting a Single Key from a Cache Group
+
+```php
+$cache->delete_group_key( 'my_cache_key_name' ); // Removes key from default group
+
+$cache->delete_group_key( 'my_cache_key_name', 'custom_cache_group' ); // Removes key from specific group
 ```
 
 ## Arguments

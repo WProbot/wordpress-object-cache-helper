@@ -44,33 +44,30 @@ class WP_Cache_Object {
      * @return  string      Cached value of key
      * @since 1.0.0
      */
-    public function get_object( $key, $callback, $args = [] ) {
-
-        // Set configuration defaults
-        $args = self::set_default_atts( $this->config, $args );
+    public function get_object( $key, $callback ) {
 
         $result = null;
         $result_group = null;
         $cache_hit = false;
 
         // Add site ID suffic to cache group if multisite
-        if( is_multisite() ) $args['group'] .= '_' . get_current_site()->id;
+        if( is_multisite() ) $this->config['group'] .= '_' . get_current_site()->id;
 
         // Set key variable, appending blog ID if network_global is false
-        $object_cache_key = $key . ( is_multisite() && !$args['network_global'] && get_current_blog_id() ? '_' . get_current_blog_id() : '' );
+        $object_cache_key = $key . ( is_multisite() && !$this->config['network_global'] && get_current_blog_id() ? '_' . get_current_blog_id() : '' );
 
         // Try to get key value from cache
-        if( !$args['force'] ) {
+        if( !$this->config['force'] ) {
 
-            if( $args['single'] ) {
+            if( $this->config['single'] ) {
 
                 // Store value in individual key
-                $result = unserialize( wp_cache_get( $object_cache_key, $args['group'], false, $cache_hit ) );
+                $result = unserialize( wp_cache_get( $object_cache_key, $this->config['group'], false, $cache_hit ) );
 
             } else {
 
                 // Store value in array of values with group as key
-                $result_group = wp_cache_get( $args['group'], $args['group'], false, $cache_hit );
+                $result_group = wp_cache_get( $this->config['group'], $this->config['group'], false, $cache_hit );
                 $result_group = $cache_hit ? (array) unserialize( $result_group ) : [];
 
                 if( $cache_hit && isset( $result_group[$object_cache_key] ) ) {
@@ -89,16 +86,16 @@ class WP_Cache_Object {
             $result = $callback();
 
             // Store cache key value pair
-            if( $args['single'] ) {
+            if( $this->config['single'] ) {
 
                 // If single, store cache value.
-                wp_cache_set( $object_cache_key, serialize( $result ), $args['group'], $args['expire'] );
+                wp_cache_set( $object_cache_key, serialize( $result ), $this->config['group'], $this->config['expire'] );
 
             } else {
 
                 // Store cache value in group array to allow "flushing" of individual group
                 $result_group[$object_cache_key] = $result;
-                wp_cache_set( $args['group'], serialize( $result_group ), $args['group'], $args['expire'] );
+                wp_cache_set( $this->config['group'], serialize( $result_group ), $this->config['group'], $this->config['expire'] );
 
             }
 
@@ -130,6 +127,30 @@ class WP_Cache_Object {
         }
 
         return true;
+
+    }
+
+    /**
+     * Deletes a single object key from a cache group. This function only works
+     * if values were stored via get_cache_object().
+     *
+     * @param   string  $object_cache_key   The cache key to delete 
+     * @param   string  $group              The name of the key group to remove the key from
+     * @return  bool    True if key exists and is deleted, false if key not set
+     * @since 1.0.0
+     */
+    public function delete_group_key( $object_cache_key, $cache_group = null ) {
+
+        $cache_group = $cache_group ?: $this->config['group'];
+        $result_group = unserialize( wp_cache_get( $cache_group, $cache_group, false, $cache_hit ) );
+
+        if( isset( $result_group[$object_cache_key] ) ) {
+            unset( $result_group[$object_cache_key] );
+            wp_cache_set( $cache_group, serialize( $result_group ), $cache_group, $this->config['expire'] );
+            return true;
+        }
+
+        return false;
 
     }
 
