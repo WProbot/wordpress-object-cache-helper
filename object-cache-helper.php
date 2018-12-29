@@ -51,6 +51,7 @@ class WP_Cache_Object {
 
         $result = null;
         $result_group = null;
+        $cache_hit = false;
 
         // Add site ID suffic to cache group if multisite
         if( is_multisite() ) $args['group'] .= '_' . get_current_site()->id;
@@ -59,21 +60,25 @@ class WP_Cache_Object {
         $object_cache_key = $key . ( is_multisite() && !$args['network_global'] && get_current_blog_id() ? '_' . get_current_blog_id() : '' );
 
         // Try to get key value from cache
-        if( $args['single'] ) {
+        if( !$args['force'] ) {
 
-            // Store value in individual key
-            $result = unserialize( wp_cache_get( $object_cache_key, $args['group'], false, $cache_hit ) );
+            if( $args['single'] ) {
 
-        } else {
+                // Store value in individual key
+                $result = unserialize( wp_cache_get( $object_cache_key, $args['group'], false, $cache_hit ) );
 
-            // Store value in array of values with group as key
-            $result_group = wp_cache_get( $args['group'], $args['group'], false, $cache_hit );
-            $result_group = $cache_hit ? (array) unserialize( $result_group ) : [];
-
-            if( $cache_hit && isset( $result_group[$object_cache_key] ) ) {
-                $result = $result_group[$object_cache_key];
             } else {
-                $cache_hit = false;
+
+                // Store value in array of values with group as key
+                $result_group = wp_cache_get( $args['group'], $args['group'], false, $cache_hit );
+                $result_group = $cache_hit ? (array) unserialize( $result_group ) : [];
+
+                if( $cache_hit && isset( $result_group[$object_cache_key] ) ) {
+                    $result = $result_group[$object_cache_key];
+                } else {
+                    $cache_hit = false;
+                }
+
             }
 
         }
@@ -99,7 +104,7 @@ class WP_Cache_Object {
 
         }
 
-        if( is_numeric( $result ) ) $result = intval( $result ) ? (int) $result : (float) $result;
+        if( is_string( $result ) && is_numeric( $result ) ) $result = intval( $result ) ? (int) $result : (float) $result;
 
         return $result;
 
