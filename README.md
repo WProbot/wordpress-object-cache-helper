@@ -6,7 +6,7 @@
 
 # WordPress Object Cache Wrapper Class
 
-A simple [MU plugin](https://codex.wordpress.org/Must_Use_Plugins) for WordPress that acts as a wrapper for [WP Object Cache](https://codex.wordpress.org/Class_Reference/WP_Object_Cache) functions, with support for flush cache by group.
+A simple [MU plugin](https://codex.wordpress.org/Must_Use_Plugins) for WordPress that acts as a wrapper for [WP Object Cache](https://codex.wordpress.org/Class_Reference/WP_Object_Cache) functions, with support for flushing cache by _group_.
 
 It was created as an MU plugin so that it is loaded and available for use in the theme as well as standard custom plugins, useful to cache heavy operations that fall outside of WordPress's built-in caching (such as [direct database queries](https://codex.wordpress.org/Class_Reference/wpdb), file and remote operations, etc).
 
