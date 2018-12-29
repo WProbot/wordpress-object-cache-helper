@@ -10,19 +10,13 @@ A simple [MU plugin](https://codex.wordpress.org/Must_Use_Plugins) for WordPress
 
 It was created as an MU plugin so that it is loaded and available for use in the theme as well as standard custom plugins, useful to cache heavy operations that fall outside of WordPress's built-in caching (such as [direct database queries](https://codex.wordpress.org/Class_Reference/wpdb), file and remote operations, etc).
 
-:construction: This project is **beta** pending further testing and added features.
-
-#### TODO
-
-- Add ability to delete cache key stored in group
-
 ## Installation
 
 Simply copy the `object-cache-helper.php` file to your `wp-content/my-plugins` directory (create one if it does not exist).
 
 ## Usage
 
-### Instantiation
+### Class Instantiation
 
 Without arguments:
 
@@ -98,7 +92,7 @@ You can flush the entire cache using [`wp_cache_flush()`](https://developer.word
 $cache->flush_group( 'my_cache_group' );
 ```
 
-#### Deleting a Single Key from a Cache Group
+#### Deleting a Specific Key From a Cache Group
 
 ```php
 $cache->delete_group_key( 'my_cache_key_name' ); // Removes key from default group
