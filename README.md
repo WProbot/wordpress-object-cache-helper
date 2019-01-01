@@ -12,7 +12,7 @@ It was created as an MU plugin so that it is loaded and available for use in the
 
 ## Installation
 
-Simply copy the `object-cache-helper.php` file to your `wp-content/my-plugins` directory (create one if it does not exist).
+Simply copy the `object-cache-helper.php` file to your `wp-content/mu-plugins` directory (create one if it does not exist).
 
 ## Usage
 
